@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Parcel Shipping Order – The UPS Store</title>
+<style>
+:root{--blue:#00b0f0;--tint:#e3eef2;--ink:#222;--line:#444}
+*{box-sizing:border-box}
+body{font-family:Arial,Helvetica,sans-serif;font-size:11px;color:var(--ink);background:#f2f2f2;margin:0;padding:16px}
+.page{max-width:850px;margin:0 auto;background:#fff;padding:20px}
+header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.logo{font-size:26px;font-weight:700;letter-spacing:1px}
+.title{font-size:20px;font-weight:700;text-align:right}
+.sub{font-weight:700;font-size:14px;text-align:right;margin-top:6px}
+input[type=text],input[type=email],input[type=tel],input[type=date],select{border:0;background:transparent;font:inherit;width:100%;padding:2px 0}
+input:focus{outline:2px solid var(--blue)}
+.ul{border-bottom:1px solid #000!important;display:inline-block;width:130px}
+.bar{background:var(--blue);color:#fff;font-weight:700;padding:3px 6px;display:flex;justify-content:space-between;align-items:center}
+.box{border:1px solid var(--line);margin-bottom:6px}
+.grid{display:grid;gap:0}
+.cell{background:var(--tint);border:1px solid #fff;padding:3px 5px;font-size:10px;min-height:34px}
+.cell input{font-size:12px}
+.two{display:grid;grid-template-columns:1fr 1fr}
+.row{display:grid}
+table{width:100%;border-collapse:collapse}
+th{background:var(--blue);color:#fff;padding:4px;font-size:11px}
+td{background:var(--tint);border:1px solid #fff;padding:0;height:22px}
+td input{padding:3px}
+.sec{border:1px solid var(--line);margin-top:6px}
+.cols{display:grid;grid-template-columns:1.1fr 1fr .8fr 1.4fr;border-bottom:1px solid var(--line)}
+.cols>div{padding:6px;border-right:1px solid var(--line);font-size:10px}
+.cols>div:last-child{border-right:0}
+label{display:block;margin:3px 0}
+.opt{display:flex;justify-content:space-between;align-items:center;gap:6px;margin:5px 0}
+.opt input{width:80px;border-bottom:1px solid #000}
+.small{font-size:9px}
+h4{margin:6px 0 2px;font-size:11px}
+.charges{display:grid;grid-template-columns:1.6fr 1fr}
+.chg{display:grid;grid-template-columns:1fr 90px;border-bottom:1px solid var(--line);padding:6px;align-items:center}
+.chg input{border-bottom:1px solid #000}
+.foot{font-size:9px;margin-top:10px;line-height:1.4}
+.btns{margin-top:14px;display:flex;gap:8px}
+button{background:var(--blue);color:#fff;border:0;padding:8px 16px;font-weight:700;cursor:pointer}
+.sig{display:grid;grid-template-columns:2fr 1.2fr;gap:20px;margin-top:6px}
+.sig input{border-bottom:1px solid #000}
+@media(max-width:700px){.two,.cols,.charges{grid-template-columns:1fr}.cols>div{border-right:0;border-bottom:1px solid var(--line)}}
+@media print{body{background:#fff;padding:0}.btns{display:none}}
+.money{display:flex;align-items:center;width:100%}
+.money b{padding:0 2px 0 4px}
+.money input{flex:1;min-width:0;width:auto!important;border:0!important}
+.opt .money,.chg .money{border-bottom:1px solid #000}
+.opt .money{width:90px;flex:none}
+.pdf-mode{width:850px!important;max-width:none!important;margin:0!important;padding:10px!important}
+.pdf-mode .two{grid-template-columns:1fr 1fr!important}
+.pdf-mode .cols{grid-template-columns:1.1fr 1fr .8fr 1.4fr!important}
+.pdf-mode .charges{grid-template-columns:1.6fr 1fr!important}
+.pdf-mode .btns,.pdf-mode #status{display:none}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+<form class="page" onsubmit="return false">
+<header>
+  <div class="logo"><img src="ups-store-logo.png" alt="The UPS Store" style="height:56px;display:block" onerror="this.outerHTML='THE UPS STORE'"></div>
+  <div>
+    <div class="title">Parcel Shipping Order #<input type="text" style="width:90px;border-bottom:1px solid #000" name="pso_no"></div>
+    <div class="sub">parcel 1 of <input class="ul" style="width:60px" type="text" name="parcel_of"> &nbsp; Date of shipment: <input class="ul" style="width:140px" type="date" name="ship_date"></div>
+  </div>
+</header>
+
+<div class="two box" style="margin-bottom:6px">
+  <div>
+    <div class="bar"><span>Shipped From – Please Print</span><label style="margin:0"><input type="checkbox" name="from_save"> Save for future shipments</label></div>
+    <div class="cell">Company Name (If Applicable)<input type="text" name="from_company"></div>
+    <div class="cell">Contact Name<input type="text" name="from_contact"></div>
+    <div class="cell">Telephone Number (Business Hours)<input type="tel" name="from_phone"></div>
+    <div class="cell">Street Address<input type="text" name="from_street"></div>
+    <div class="row" style="grid-template-columns:2fr 1fr">
+      <div class="cell">City – Province<input type="text" name="from_city"></div>
+      <div class="cell">Postal Code<input type="text" name="from_postal"></div>
+    </div>
+    <div class="cell">Email Address (Shipment tracking information available via email)<input type="email" name="from_email"></div>
+  </div>
+  <div>
+    <div class="bar"><span>Ship To – Please Print</span><label style="margin:0"><input type="checkbox" name="to_save"> Save for future shipments</label></div>
+    <div class="cell">Company Name (If Applicable)<input type="text" name="to_company"></div>
+    <div class="cell">Contact Name<input type="text" name="to_contact"></div>
+    <div class="row" style="grid-template-columns:2fr 1fr">
+      <div class="cell">Telephone Number (Business Hours)<input type="tel" name="to_phone"></div>
+      <div class="cell">Country<input type="text" name="to_country"></div>
+    </div>
+    <div class="cell">Street Address<input type="text" name="to_street"></div>
+    <div class="row" style="grid-template-columns:2fr 1fr">
+      <div class="cell">City – Province/State<input type="text" name="to_city"></div>
+      <div class="cell">Postal Code/Zip Code<input type="text" name="to_postal"></div>
+    </div>
+    <div class="cell">Email Address (Shipment tracking information available via email)<input type="email" name="to_email"></div>
+  </div>
+</div>
+
+<div class="box bar" style="background:#fff;color:#000;border:1px solid #000;justify-content:flex-start;gap:8px;padding:6px">
+  <input type="checkbox" name="express_env" style="width:auto">
+  <span style="background:var(--blue);color:#fff;padding:4px 8px;flex:1">Express Envelope Quick Shipment – Documents only, $0.00 value for loss or damage</span>
+  <input class="ul" style="width:100px" type="text" name="express_initials" placeholder="initials">
+  <span class="small" style="font-weight:400">(Customer's initials)</span>
+</div>
+
+<table id="items">
+  <tr><th>Unit of Measure</th><th style="width:30%">Description of Contents</th><th>Origin Country<br><small>(If shipping internationally)</small></th><th>Unit Value</th><th>Value of Contents</th><th>Remarks<br><small>(If shipping internationally)</small></th></tr>
+  <script>
+  for(let i=1;i<=4;i++)document.write(`<tr><td><input type="text" name="uom${i}"></td><td><input type="text" name="desc${i}"></td><td><input type="text" name="origin${i}"></td><td><input type="number" step="0.01" min="0" name="unit${i}" class="u" placeholder="$"></td><td><input type="number" step="0.01" min="0" name="val${i}" class="v" placeholder="$"></td><td><input type="text" name="rem${i}"></td></tr>`);
+  </script>
+  <tr><td colspan="4" style="border:0;background:none"></td><td colspan="1" style="background:var(--blue);color:#fff;font-size:10px;text-align:center">Total Value of Contents listed in CDN</td><td style="background:var(--tint)"><input type="text" id="total" name="total_value" placeholder="$" readonly></td></tr>
+</table>
+
+<p style="margin:8px 0 4px"><b>Customs Clearance Waiver</b> <input class="ul" style="width:90px" type="text" name="customs_initials"> <span class="small">(Customer's initials)</span><br>
+I acknowledge that the Description of Contents and Value recorded above are truthful and complete. I further acknowledge that duty and taxes may be assessed to the Consignee by the Customs Office in the country of destination at their sole discretion.</p>
+
+<div class="sec">
+  <div class="bar"><span>Coverage Details</span><span>Please select one of the following options.</span></div>
+  <div class="cols">
+    <div>
+      Are the contents of the Parcel breakable?
+      <label><input type="radio" name="breakable" value="yes"> Yes &nbsp; <input type="radio" name="breakable" value="no"> No</label>
+      Please describe the delivery address.
+      <label><input type="radio" name="addr_type" value="residential"> Residential &nbsp; <input type="radio" name="addr_type" value="commercial"> Commercial</label>
+      Do you require a signature on delivery?
+      <label><input type="radio" name="signature" value="yes"> Yes (Additional fees apply)</label>
+      <label><input type="radio" name="signature" value="no"> No</label>
+    </div>
+    <div>
+      Are the contents of the Parcel replaceable?
+      <label><input type="radio" name="replaceable" value="yes"> Yes &nbsp; <input type="radio" name="replaceable" value="no"> No</label>
+      <h4>Optional Coverage for damage and/or loss</h4>
+      Available for UPS shipments only, Pack and Ship Guarantee (PSG) or Shipment Protection.<br><br>
+      Declared Value is available from other carriers for damage and/or loss subject to their terms and conditions.
+    </div>
+    <div>
+      <h4>Coverage Options</h4>
+      <label>No coverage for loss or damage.<br><input type="radio" name="coverage_opt" value="none"></label>
+      <label>Coverage for loss and damage.<br><input type="radio" name="coverage_opt" value="loss_damage"></label>
+      <label>Coverage for loss only.<br><input type="radio" name="coverage_opt" value="loss_only"></label>
+    </div>
+    <div>
+      <div class="opt"><span>1. Pack and Ship Guarantee – coverage for loss and damage, plus packing and shipping charges.</span><input type="text" name="cov1" placeholder="$"></div>
+      <div class="opt"><span>2. Shipment Protection – coverage for loss and damage only.</span><input type="text" name="cov2" placeholder="$"></div>
+      <div class="opt"><span>3. Shipment Protection – coverage for loss only.</span><input type="text" name="cov3" placeholder="$"></div>
+      <div class="opt"><span>4. Declared Value coverage for loss and damage.</span><input type="text" name="cov4" placeholder="$"></div>
+      <div class="opt"><span>5. Declared Value coverage for loss only.</span><input type="text" name="cov5" placeholder="$"></div>
+      <div class="opt" style="justify-content:flex-end"><input type="text" name="cov_initials" style="width:110px"> (Customer's initials)</div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 2.6fr;font-size:10px">
+    <div style="padding:6px;border-right:1px solid var(--line)">
+      <h4>General Classification of the Contents of the Parcel</h4>
+      <label><input type="radio" name="classification" value="general"> General merchandise <span class="small">(new or used commercial)</span></label>
+      <label><input type="radio" name="classification" value="personal"> Personal effects/breakables<sup>1</sup></label>
+      <label><input type="radio" name="classification" value="art"> Artwork/antiques<sup>1</sup></label>
+      <label><input type="radio" name="classification" value="jewellery"> Jewellery and watches<sup>2</sup></label>
+      <label><input type="radio" name="classification" value="docrecon"> Document reconstruction<sup>3</sup></label>
+      <div class="small" style="margin-top:4px">1. $10,000 coverage available for PSG and $2,500 for Shipment Protection.<br>2. $2,500 coverage available for domestic shipments, and $500 for international shipments.<br>3. $500 coverage available.</div>
+    </div>
+    <div style="padding:6px">
+      Were the contents of the Parcel packed by The UPS Store personnel?
+      <input type="radio" name="packed_by_store" value="yes"> Yes &nbsp; <input type="radio" name="packed_by_store" value="no"> No
+      <p>If "No", please acknowledge your agreement to one of the following:</p>
+      <p><b>Pre-Pack Waiver</b> <input class="ul" style="width:90px" type="text" name="prepack_initials"> (Customer's initials)<br>
+      I have declined packing service offered by The UPS Store and acknowledge that if purchased, any coverage for the Parcel is limited to loss as provided herein, and that the Carrier's packing standards for Shock, Vibration, and Compression have been explained to me by The UPS Store personnel.</p>
+      <p><b>Shipper's Risk</b> <input class="ul" style="width:90px" type="text" name="risk_initials"> (Customer's initials)<br>
+      I have declined coverage for the contents of the Parcel and agree that any loss or damage of the contents shall be at my sole risk.</p>
+    </div>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="bar"><span>Shipment Details and Charges</span><span>All charges exclude applicable sales taxes</span></div>
+  <div class="charges">
+    <div style="padding:6px;border-right:1px solid var(--line)">
+      Parcel Dimensions (amounts rounded off to nearest inch)<br>
+      L <input class="ul" style="width:70px" type="text" name="dim_l"> x W <input class="ul" style="width:70px" type="text" name="dim_w"> x H <input class="ul" style="width:70px" type="text" name="dim_h">
+      <label><input type="radio" name="shape" value="rect"> Rectangular (Box/Env/Pak)</label>
+      <label><input type="radio" name="shape" value="nonrect"> *Non-rectangular (Mailing Tube)</label>
+      <div class="small">*Non-rectangular packages may be subject to additional handling fees.</div>
+      <br>Actual Weight <input class="ul" style="width:60px" type="text" name="weight_actual"> Lbs. &nbsp; Dimensional Weight <input class="ul" style="width:60px" type="text" name="weight_dim"> Lbs.
+      <br><br>Carrier Tracking # <input class="ul" style="width:60%" type="text" name="tracking">
+      <label><input type="radio" name="carrier" value="ups"> UPS &nbsp; <input type="radio" name="carrier" value="other"> Other <input class="ul" style="width:50%" type="text" name="carrier_other"></label>
+      <label><input type="radio" name="service" value="express"> Express Service &nbsp; <input type="radio" name="service" value="expedited"> Expedited Service &nbsp; <input type="radio" name="service" value="ground"> Ground Service &nbsp; <input type="radio" name="service" value="other"> Other <input class="ul" style="width:30%" type="text" name="service_other"></label>
+    </div>
+    <div>
+      <div class="chg"><span>Freight Charges</span><input type="text" name="c_freight" placeholder="$"></div>
+      <div class="chg"><span>Additional Service Fees</span><input type="text" name="c_addl" placeholder="$"></div>
+      <div class="chg"><span>PSG Fees<br><small>Coverage Details #1</small></span><input type="text" name="c_psg" placeholder="$"></div>
+      <div class="chg"><span>Shipment Protection Fees<br><small>Coverage Details #2 or #3</small></span><input type="text" name="c_sp" placeholder="$"></div>
+      <div class="chg"><span>Declared Value Fees<br><small>Coverage Details #4 or #5</small></span><input type="text" name="c_dv" placeholder="$"></div>
+      <div class="chg"><span>Packing Materials &amp; Labour</span><input type="text" name="c_pack" placeholder="$"></div>
+      <div class="chg" style="border:0"><span><b>Total Charges</b></span><input type="text" name="c_total" placeholder="$"></div>
+    </div>
+  </div>
+  <div style="padding:6px;border-top:1px solid var(--line)">
+    <b>Customer's Acknowledgement</b><br>
+    I certify that I agree to the terms and conditions included on both sides of this form, and that the stated contents and their value as recorded in the spaces above are truthful and complete.
+    <div class="sig"><div>Customer Signature<input type="text" name="signature_name"></div><div>Date<input type="date" name="sign_date" style="border-bottom:1px solid #000"></div></div>
+  </div>
+</div>
+
+<div class="foot">
+  The UPS Store® locations in Canada are independently owned and operated by licensed franchisees of MBEC Communications Inc., master licensee of The UPS Store, Inc., a subsidiary of United Parcel Service of America, Inc. The UPS Store® and other UPS® trademarks are owned by United Parcel Service of America, Inc. and used under license. Services and hours of operation may vary.<br><br>
+  I agree to receive electronic messages from this The UPS Store containing news, updates, and promotions. <input class="ul" style="width:120px" type="text" name="consent_initials">. Consent may be withdrawn at any time by contacting this The UPS Store.
+  <p style="font-size:11px;margin-top:12px">Please read the <a href="terms-and-conditions.html" target="_blank" rel="noopener">Terms and Conditions of Service</a> (Side 2 of this form).</p>
+  <div style="display:flex;justify-content:space-between;margin-top:14px"><span>Version 8.2</span><span>Side 1</span><span>© 2026 The UPS Store Canada</span></div>
+</div>
+
+<div class="btns"><button type="button" onclick="window.print()">Print</button><button type="reset">Clear form</button><button type="button" id="submitBtn" onclick="submitForm()">Submit</button></div>
+<p id="status" role="status" style="font-weight:700;margin-top:8px"></p>
+</form>
+<script>
+// Give every money field a permanent "$" in front of the typed number
+document.querySelectorAll('input[placeholder="$"]').forEach(i=>{
+  const w=document.createElement('span'); w.className='money'; w.innerHTML='<b>$</b>';
+  i.parentNode.insertBefore(w,i); w.appendChild(i);
+  i.removeAttribute('placeholder'); i.type='text'; i.inputMode='decimal';
+  if(!i.readOnly) i.addEventListener('input',()=>{ i.value=i.value.replace(/[^0-9.]/g,''); });
+});
+document.querySelectorAll('.v').forEach(e=>e.addEventListener('input',()=>{
+  let t=0;document.querySelectorAll('.v').forEach(x=>t+=parseFloat(x.value)||0);
+  document.getElementById('total').value=t?t.toFixed(2):'';
+}));
+
+// Set this to your server/endpoint URL later. While empty, Submit downloads the form as a JSON file.
+const SUBMIT_URL = "";
+
+async function submitForm(){
+  const form = document.querySelector('form.page');
+  const status = document.getElementById('status');
+  const data = {};
+  new FormData(form).forEach((v,k)=>{ data[k]=v; });
+  data.submitted_at = new Date().toISOString();
+  try{
+    if(SUBMIT_URL){
+      const r = await fetch(SUBMIT_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+      if(!r.ok) throw new Error('Server returned '+r.status);
+      status.textContent = 'Submitted. Thank you!';
+      form.reset();
+    }else{
+      const name = 'PSO_'+(data.pso_no||'order')+'_'+Date.now()+'.pdf';
+      status.textContent = 'Creating PDF...';
+      const prevScroll = window.scrollY;
+      window.scrollTo(0,0);
+      form.classList.add('pdf-mode');
+      await new Promise(r=>setTimeout(r,150));
+      // Capture the live form exactly as shown, then put it on ONE page sized to fit it.
+      const canvas = await html2canvas(form,{
+        scale:2, useCORS:true, backgroundColor:'#ffffff',
+        scrollX:0, scrollY:0, x:0, y:0,
+        width:form.offsetWidth, height:form.offsetHeight,
+        windowWidth:document.documentElement.scrollWidth,
+        windowHeight:document.documentElement.scrollHeight
+      });
+      const w = canvas.width/2, h = canvas.height/2;        // CSS pixels
+      const pdf = new window.jspdf.jsPDF({
+        orientation: w>h ? 'landscape' : 'portrait',
+        unit:'px', format:[w,h], hotfixes:['px_scaling']
+      });
+      pdf.addImage(canvas.toDataURL('image/jpeg',0.95),'JPEG',0,0,w,h);
+      pdf.save(name);
+      window.scrollTo(0,prevScroll);
+      form.classList.remove('pdf-mode');
+      status.textContent = 'Saved to this computer as '+name;
+    }
+  }catch(e){
+    form.classList.remove('pdf-mode');
+    status.textContent = 'Could not submit: '+e.message+'. Please try again or ask staff for help.';
+  }
+}
+</script>
+</body>
+</html>
